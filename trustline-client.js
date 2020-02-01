@@ -42,7 +42,5 @@ let handler = stream => {
 }
 
 
-console.log('connecting to ', remoteIP);
-const server = net.createServer(handler);
-server.listen(port);
+let client= net.createConnection(port, remoteIP, handler);
 
