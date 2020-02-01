@@ -11,7 +11,7 @@ const remoteIP = process.argv[2];
 let balance = 0;
 
 
-let serverHanler = steam => {
+let serverHanler = stream => {
     stream.on('data', data => {
         let cmd = data.toString();
         if (cmd.startsWith('pay')) {
