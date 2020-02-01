@@ -42,5 +42,19 @@ let handler = stream => {
 }
 
 
-let client= net.createConnection(port, remoteIP, handler);
+let client= net.createConnection(port, remoteIP);
+
+client.on('data', data =>{
+let cmd= data.toString();   			
+if(cmd.startsWith('pay')){
+  let paid= Number(cmd.substring(4));
+  balance = balance + paid
+  console.log('you were paid', paid);
+}
+else{
+console.log('command not recognized');
+}
+
+
+});
 
