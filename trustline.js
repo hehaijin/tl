@@ -9,15 +9,29 @@ let connected = false;
 
 const remoteIP = process.argv[2];
 let balance = 0;
-let handler = stream => {
-    if (connected) {
-        return;
-    }
-    connected = true;
-    console.log('remote address ', stream.remoteAddres);
-    if (stream.remoteAddress !== remoteIP) {
-        // stream.end();
-    }
+
+
+let serverHanler = steam => {
+    stream.on('data', data => {
+        let cmd = data.toString();
+        if (cmd.startsWith('pay')) {
+            let paid = Number(cmd.substring(4));
+            balance = balance + paid
+            console.log('you were paid', paid);
+        }
+        else {
+            console.log('command not recognized');
+        }
+    });
+    // or end; seems the same
+    stream.on('close', () => {
+        console.log('Other side disconnected');
+        console.log('Good Bye');
+        process.exit(0);
+    });
+}
+
+let clientHandler = steam => {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
@@ -43,31 +57,25 @@ let handler = stream => {
         rl.prompt();
     })
 
-    stream.on('data', data => {
-        let cmd = data.toString();
-        if (cmd.startsWith('pay')) {
-            let paid = Number(cmd.substring(4));
-            balance = balance + paid
-            console.log('you were paid', paid);
-        }
-        else {
-            console.log('command not recognized');
-        }
-        rl.prompt();
-    });
+}
 
-    // or end; seems the same
-    stream.on('close', () => {
-        console.log('Other side disconnected');
-        console.log('Good Bye');
-        process.exit(0);
-    });
 
+
+let handler = stream => {
+    if (connected) {
+        return;
+    }
+    connected = true;
+    console.log('remote address ', stream.remoteAddres);
+    if (stream.remoteAddress !== remoteIP) {
+        // stream.end();
+    }
 
 }
 
-console.log('connecting to ', remoteIP);
-const server = net.createServer(handler);
+const server = net.createServer(serverHanler);
 server.listen(port);
 
-
+console.log('connecting to ', remoteIP);
+let client = net.createConnection(port, remoteIP);
+clientHandler(client);
