@@ -31,7 +31,7 @@ let serverHanler = stream => {
     });
 }
 
-let clientHandler = steam => {
+let clientHandler = stream => {
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout
@@ -77,5 +77,7 @@ const server = net.createServer(serverHanler);
 server.listen(port);
 
 console.log('connecting to ', remoteIP);
-let client = net.createConnection(port, remoteIP);
-clientHandler(client);
+let client = net.createConnection(port, remoteIP, () => {
+    console.log('connected');
+    clientHandler(client);
+});
