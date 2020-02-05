@@ -5,7 +5,7 @@ const readline = require('readline')
 const port = 8089;
 console.log('Welcome to your trustline!');
 
-let connected = false;
+// let connected = false;
 
 const remoteIP = process.argv[2];
 let balance = 0;
@@ -18,6 +18,8 @@ let serverHanler = stream => {
             let paid = Number(cmd.substring(4));
             balance = balance + paid
             console.log('you were paid', paid);
+        }else if ( cmd.startsWith('say')){
+            console.log('The other side says', cmd.substring(3));
         }
         else {
             console.log('command not recognized');
@@ -40,7 +42,10 @@ let clientHandler = stream => {
     rl.on('line', line => {
         if (line === 'balance') {
             console.log(balance);
-        } else if (line.startsWith('pay')) {
+        }else if( line.startsWith('say')){
+            stream.write(line);
+        }
+        else if (line.startsWith('pay')) {
             let paid = Number(line.substring(4));
             console.log('Sent');
             balance = balance - paid;
@@ -59,19 +64,6 @@ let clientHandler = stream => {
 
 }
 
-
-
-let handler = stream => {
-    if (connected) {
-        return;
-    }
-    connected = true;
-    console.log('remote address ', stream.remoteAddres);
-    if (stream.remoteAddress !== remoteIP) {
-        // stream.end();
-    }
-
-}
 
 const server = net.createServer(serverHanler);
 server.listen(port);
